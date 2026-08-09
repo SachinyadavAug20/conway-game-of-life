@@ -1,35 +1,14 @@
 #include <raylib.h>
 
-#include "resource_dir.h"
-
-const int windowWidth=600;
-const int windowHeight=600;
-const int ballSpeed=10;
+const int WINDOW_W=750;
+const int WINDOW_H=750;
+int FPS=12;
 int main(){
-  SearchAndSetResourceDir("resources");
-  int ballX=windowWidth/2;
-  int ballY=windowHeight/2;
-  Color green={20,160,133,255};
-
-  InitWindow(windowWidth, windowHeight, "Raylib");// width,height,title
-  SetTargetFPS(60);
-  // Game loop (will run 60 times a second)
+  InitWindow(WINDOW_W, WINDOW_H, "Conway's Game of Life");
+  SetTargetFPS(FPS);
   while (WindowShouldClose()==false) {
-    // 1.Event handling
-    if(IsKeyDown(KEY_RIGHT)){
-      ballX+=ballSpeed;
-    }else if(IsKeyDown(KEY_LEFT)){
-      ballX-=ballSpeed;
-    }else if(IsKeyDown(KEY_DOWN)){
-      ballY+=ballSpeed;
-    }else if(IsKeyDown(KEY_UP)){
-      ballY-=ballSpeed;
-    }
-    // 2.updating positions
-    // 3.drawing
     BeginDrawing();
-    ClearBackground(green);
-    DrawCircle(ballX,ballY, 20, WHITE);
+    ClearBackground(DARKGRAY);
     EndDrawing();
   }
   CloseWindow();
