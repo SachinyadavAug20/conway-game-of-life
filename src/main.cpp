@@ -4,7 +4,7 @@
 
 const int BOARD_W = 750;
 const int BOARD_H = 750;
-const int PANEL_W = 360;
+const int PANEL_W = 400;
 const int WINDOW_W = BOARD_W + PANEL_W;
 const int WINDOW_H = BOARD_H;
 const int MIN_CELL_SIZE = 8;
@@ -24,9 +24,14 @@ const int PRESET_KEYS[] = {
 int main() {
   Color GREY = {29, 29, 29, 255};
   InitWindow(WINDOW_W, WINDOW_H, "Conway's Game of Life");
+  Font uiFont = LoadFontEx("assets/fonts/FiraCode-Regular.ttf", 48, 0, 256);
+  if (uiFont.texture.id == 0) {
+    uiFont = GetFontDefault();
+  }
+  SetTextureFilter(uiFont.texture, TEXTURE_FILTER_BILINEAR);
   SetTargetFPS(FPS);
   Simulation simulation(BOARD_W, BOARD_H, CELL_SIZE);
-  UI ui;
+  UI ui(uiFont);
 
   while (WindowShouldClose() == false) {
     // event
@@ -107,6 +112,7 @@ int main() {
 
     EndDrawing();
   }
+  UnloadFont(uiFont);
   CloseWindow();
   return 0;
 }

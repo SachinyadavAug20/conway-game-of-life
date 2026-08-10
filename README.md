@@ -23,3 +23,5 @@ make initial configuration and run game.
 
 
 "Simple rule can make great things."
+
+about concept : https://en.wikipedia.org/wiki/Conway's_Game_of_Life
