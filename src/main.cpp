@@ -33,15 +33,31 @@ int main() {
   Simulation simulation(BOARD_W, BOARD_H, CELL_SIZE);
   UI ui(uiFont);
 
+  int lastRow = -1, lastCol = -1, lastButton = 0;
+
   while (WindowShouldClose() == false) {
+    bool wasRunning = simulation.IsRunning();
+
     // event
-    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-      Vector2 mousePos = GetMousePosition();
-      if (mousePos.x < BOARD_W) {
-        int cellSize = simulation.getCellSize();
-        int row = mousePos.y / cellSize;
-        int col = mousePos.x / cellSize;
-        simulation.toggleCell(row, col);
+    Vector2 mousePos = GetMousePosition();
+    int button = 0;
+    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+      button = 1;
+    else if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+      button = 2;
+    if (button != lastButton) {
+      lastRow = -1;
+      lastCol = -1;
+      lastButton = button;
+    }
+    if (button != 0 && mousePos.x < BOARD_W && !simulation.IsRunning()) {
+      int cellSize = simulation.getCellSize();
+      int row = mousePos.y / cellSize;
+      int col = mousePos.x / cellSize;
+      if (row != lastRow || col != lastCol) {
+        simulation.setCellValue(row, col, button == 1 ? 1 : 0);
+        lastRow = row;
+        lastCol = col;
       }
     }
 
@@ -90,7 +106,9 @@ int main() {
     }
 
     // update
-    simulation.update();
+    if (wasRunning == simulation.IsRunning()) {
+      simulation.update();
+    }
 
     // draw
     BeginDrawing();

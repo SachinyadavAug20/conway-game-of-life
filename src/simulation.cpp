@@ -12,7 +12,10 @@ const std::pair<int, int> neighbors[] = {
 void Simulation::Draw() { grid.Draw(); }
 
 void Simulation::setCellValue(int row, int col, int val) {
-  grid.setValue(row, col, val);
+  if (!IsRunning()) {
+    grid.setValue(row, col, val);
+    refreshCounts();
+  }
 }
 
 int Simulation::countLiveNeighbors(int row, int col) {
