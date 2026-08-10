@@ -11,6 +11,11 @@ public:
   void SetValue(int row, int col, int value);
   int getCell(int row, int col);
   bool IsWithinBounds(int row, int col);
+  int getRows() { return rows; }
+  int getcols() { return cols; }
+  void FillRandomly();
+  void clear();
+  void ToggleCell(int row, int col);
 
 private:
   int rows;
