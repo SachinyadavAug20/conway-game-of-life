@@ -1,4 +1,5 @@
 #include "ui.hpp"
+#include "patterns.hpp"
 #include <cstdarg>
 #include <cstdio>
 #include <string>
@@ -37,10 +38,12 @@ void UI::Draw(const HudInfo &info) const {
   int livePct = total > 0 ? (info.live * 100) / total : 0;
   int deadPct = 100 - livePct;
 
-  int statLines = 5;
-  int controlLines = 7;
-  float panelHeight =
-      PADDING * 2 + statLines * LINE_HEIGHT + 24 + (controlLines + 1) * LINE_HEIGHT;
+  int statLines = 6;
+  int presetLines = 8;
+  int controlLines = 9;
+  float panelHeight = PADDING * 2 + (statLines + presetLines + controlLines) *
+                                         LINE_HEIGHT +
+                      24 + 24;
 
   DrawRectangleRounded({panelX, panelY, PANEL_WIDTH, panelHeight}, 0.12f, 8,
                        PANEL_COLOR);
@@ -77,6 +80,23 @@ void UI::Draw(const HudInfo &info) const {
              {panelX + PANEL_WIDTH - PADDING, y + 6}, 1, LABEL_COLOR);
   y += 24;
 
+  DrawText("Presets (numpad 1-7)", panelX + PADDING, y, FONT_SIZE,
+           LABEL_COLOR);
+  y += LINE_HEIGHT;
+
+  for (int i = 0; i < 7; i++) {
+    bool active = (i + 1) == info.activePreset;
+    std::string line =
+        fmt("%s%d  %s", active ? "> " : "  ", i + 1, PRESETS[i].name);
+    DrawText(line.c_str(), panelX + PADDING, y, FONT_SIZE,
+             active ? RUN_COLOR : TEXT_COLOR);
+    y += LINE_HEIGHT;
+  }
+
+  DrawLineEx({panelX + PADDING, y + 6},
+             {panelX + PANEL_WIDTH - PADDING, y + 6}, 1, LABEL_COLOR);
+  y += 24;
+
   DrawText("Controls", panelX + PADDING, y, FONT_SIZE, LABEL_COLOR);
   y += LINE_HEIGHT;
 
@@ -86,6 +106,7 @@ void UI::Draw(const HudInfo &info) const {
       "R       - random fill",
       "C       - clear grid",
       "[  /  ] - cell size -/+",
+      "1 - 7   - load preset",
       "W / S   - speed up / down",
       "ESC     - quit",
   };

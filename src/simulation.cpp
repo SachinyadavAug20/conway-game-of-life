@@ -98,3 +98,24 @@ void Simulation::resize(int cellSize) {
   generation = 0;
   refreshCounts();
 }
+
+void Simulation::loadPattern(const Pattern &p) {
+  stop();
+  resize(p.cellSize);
+  grid.clear();
+
+  auto cells = parseRle(p.rle);
+  int patRows = 0, patCols = 0;
+  for (const auto &cell : cells) {
+    patRows = std::max(patRows, cell.first + 1);
+    patCols = std::max(patCols, cell.second + 1);
+  }
+  int offsetRow = std::max(0, (grid.getRows() - patRows) / 2);
+  int offsetCol = std::max(0, (grid.getCols() - patCols) / 2);
+  for (const auto &cell : cells) {
+    grid.setValue(offsetRow + cell.first, offsetCol + cell.second, 1);
+  }
+
+  generation = 0;
+  refreshCounts();
+}

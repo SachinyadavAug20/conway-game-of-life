@@ -1,5 +1,6 @@
 #pragma once
 #include "grid.hpp"
+#include "patterns.hpp"
 
 class Simulation {
 public:
@@ -20,6 +21,7 @@ public:
   void createRandomState();
   void toggleCell(int row, int col);
   void resize(int cellSize);
+  void loadPattern(const Pattern &p);
   int getGeneration() const { return generation; }
   int getLiveCount() const { return liveCount; }
   int getDeadCount() const { return deadCount; }

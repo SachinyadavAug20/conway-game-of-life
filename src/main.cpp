@@ -13,6 +13,13 @@ const int MIN_FPS = 5;
 const int MAX_FPS = 60;
 int FPS = 12;
 int CELL_SIZE = 25;
+int ACTIVE_PRESET = -1;
+
+const int PRESET_KEYS[] = {
+    KEY_KP_1, KEY_KP_2, KEY_KP_3, KEY_KP_4,
+    KEY_KP_5, KEY_KP_6, KEY_KP_7,
+    KEY_ONE, KEY_TWO, KEY_THREE, KEY_FOUR, KEY_FIVE, KEY_SIX, KEY_SEVEN,
+};
 
 int main() {
   Color GREY = {29, 29, 29, 255};
@@ -26,13 +33,28 @@ int main() {
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
       Vector2 mousePos = GetMousePosition();
       if (mousePos.x < BOARD_W) {
-        int row = mousePos.y / CELL_SIZE;
-        int col = mousePos.x / CELL_SIZE;
+        int cellSize = simulation.getCellSize();
+        int row = mousePos.y / cellSize;
+        int col = mousePos.x / cellSize;
         simulation.toggleCell(row, col);
       }
     }
 
-    if (IsKeyPressed(KEY_SPACE)) {
+    int presetIndex = -1;
+    for (int i = 0; i < 7; i++) {
+      if (IsKeyPressed(PRESET_KEYS[i]) || IsKeyPressed(PRESET_KEYS[i + 7])) {
+        presetIndex = i;
+        break;
+      }
+    }
+
+    if (presetIndex >= 0) {
+      simulation.loadPattern(PRESETS[presetIndex]);
+      FPS = PRESETS[presetIndex].fps;
+      CELL_SIZE = simulation.getCellSize();
+      ACTIVE_PRESET = presetIndex + 1;
+      SetTargetFPS(FPS);
+    } else if (IsKeyPressed(KEY_SPACE)) {
       simulation.toggleRunning();
     } else if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) {
       if (FPS < MAX_FPS) {
@@ -51,11 +73,13 @@ int main() {
     } else if (IsKeyPressed(KEY_RIGHT_BRACKET)) {
       if (CELL_SIZE < MAX_CELL_SIZE) {
         CELL_SIZE += 5;
+        ACTIVE_PRESET = -1;
         simulation.resize(CELL_SIZE);
       }
     } else if (IsKeyPressed(KEY_LEFT_BRACKET)) {
       if (CELL_SIZE > MIN_CELL_SIZE) {
         CELL_SIZE -= 5;
+        ACTIVE_PRESET = -1;
         simulation.resize(CELL_SIZE);
       }
     }
@@ -78,6 +102,7 @@ int main() {
     info.rows = simulation.getRows();
     info.cols = simulation.getCols();
     info.cellSize = simulation.getCellSize();
+    info.activePreset = ACTIVE_PRESET;
     ui.Draw(info);
 
     EndDrawing();

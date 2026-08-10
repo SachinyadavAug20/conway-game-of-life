@@ -11,6 +11,7 @@ struct HudInfo {
   int rows;
   int cols;
   int cellSize;
+  int activePreset;
 };
 
 class UI {
