@@ -1,52 +1,100 @@
 #include "simulation.hpp"
 #include <raylib.h>
-#include <vector>
+#include <algorithm>
 #include <utility>
-using namespace std;
 
-vector<pair<int, int>> neighbors = {{-1, 0},  {1, 0},  {0, -1}, {0, 1},
-                                    {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
+namespace {
+const std::pair<int, int> neighbors[] = {
+    {-1, 0}, {1, 0},  {0, -1}, {0, 1},
+    {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
+}
 
 void Simulation::Draw() { grid.Draw(); }
-void Simulation::SetCellValue(int row, int col, int val) {
-  grid.SetValue(row, col, val);
+
+void Simulation::setCellValue(int row, int col, int val) {
+  grid.setValue(row, col, val);
 }
-int Simulation::CountLiveNeigbors(int row, int col) {
+
+int Simulation::countLiveNeighbors(int row, int col) {
   int count = 0;
-  for (auto &neighbor : neighbors) {
-    int x = (row + neighbor.first + grid.getRows()) % grid.getRows();
-    int y = (col + neighbor.second + grid.getcols()) % grid.getcols();
+  int rows = grid.getRows();
+  int cols = grid.getCols();
+  for (const auto &neighbor : neighbors) {
+    int x = (row + neighbor.first + rows) % rows;
+    int y = (col + neighbor.second + cols) % cols;
     if (grid.getCell(x, y) > 0) {
       count++;
     }
   }
   return count;
 }
+
 void Simulation::update() {
-  if(IsRunning()==false) return;
+  if (!IsRunning()) return;
   for (int row = 0; row < grid.getRows(); row++) {
-    for (int col = 0; col < grid.getcols(); col++) {
+    for (int col = 0; col < grid.getCols(); col++) {
       int val = grid.getCell(row, col);
-      int liveNeigbors = CountLiveNeigbors(row, col);
-      if(val==1){
-        if(liveNeigbors>3 || liveNeigbors<2) tempGrid.SetValue(row, col, 0);
-        else tempGrid.SetValue(row, col, 1);
-      }else {
-        if(liveNeigbors==3) tempGrid.SetValue(row, col, 1);
-        else tempGrid.SetValue(row, col, 0);
+      int liveNeighbors = countLiveNeighbors(row, col);
+      if (val == 1) {
+        if (liveNeighbors > 3 || liveNeighbors < 2)
+          tempGrid.setValue(row, col, 0);
+        else
+          tempGrid.setValue(row, col, 1);
+      } else {
+        if (liveNeighbors == 3)
+          tempGrid.setValue(row, col, 1);
+        else
+          tempGrid.setValue(row, col, 0);
       }
     }
   }
-  grid=tempGrid;
+  std::swap(grid, tempGrid);
+  generation++;
+  refreshCounts();
 }
 
-void Simulation::ClearGride(){
-  if(!IsRunning()) grid.clear();
+void Simulation::refreshCounts() {
+  liveCount = grid.getLiveCount();
+  deadCount = grid.getRows() * grid.getCols() - liveCount;
 }
 
-void Simulation::CreateRandomState(){
-  if(!IsRunning()) grid.FillRandomly();
+void Simulation::ClearGrid() {
+  if (!IsRunning()) {
+    grid.clear();
+    generation = 0;
+    refreshCounts();
+  }
 }
-void Simulation::ToggleCell(int row,int col){
-  if(!IsRunning()) grid.ToggleCell(row,col);
+
+void Simulation::createRandomState() {
+  if (!IsRunning()) {
+    grid.fillRandomly();
+    generation = 0;
+    refreshCounts();
+  }
+}
+
+void Simulation::toggleCell(int row, int col) {
+  if (!IsRunning()) {
+    grid.toggleCell(row, col);
+    refreshCounts();
+  }
+}
+
+void Simulation::resize(int cellSize) {
+  int oldRows = grid.getRows();
+  int oldCols = grid.getCols();
+  Grid newGrid(width, height, cellSize);
+  Grid newTemp(width, height, cellSize);
+  int copyRows = std::min(oldRows, newGrid.getRows());
+  int copyCols = std::min(oldCols, newGrid.getCols());
+  for (int row = 0; row < copyRows; row++) {
+    for (int col = 0; col < copyCols; col++) {
+      newGrid.setValue(row, col, grid.getCell(row, col));
+    }
+  }
+  grid = newGrid;
+  tempGrid = newTemp;
+  generation = 0;
+  refreshCounts();
 }

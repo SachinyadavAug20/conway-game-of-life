@@ -1,7 +1,8 @@
 #include "grid.hpp"
 #include "raylib.h"
+#include <algorithm>
 
-void Gride::Draw() {
+void Grid::Draw() {
   for (int row = 0; row < rows; row++) {
     for (int col = 0; col < cols; col++) {
       Color color =
@@ -11,19 +12,19 @@ void Gride::Draw() {
     }
   }
 }
-void Gride::SetValue(int row, int col, int value) {
-  if (IsWithinBounds(row, col))
+void Grid::setValue(int row, int col, int value) {
+  if (isWithinBounds(row, col))
     cells[row][col] = value;
 }
-int Gride::getCell(int row, int col) {
-  if (IsWithinBounds(row, col))
+int Grid::getCell(int row, int col) const {
+  if (isWithinBounds(row, col))
     return cells[row][col];
   return -1;
 }
-bool Gride::IsWithinBounds(int row, int col) {
+bool Grid::isWithinBounds(int row, int col) const {
   return (row >= 0 && row < rows && col >= 0 && col < cols);
 }
-void Gride::FillRandomly() {
+void Grid::fillRandomly() {
   for (int row = 0; row < rows; row++) {
     for (int col = 0; col < cols; col++) {
       int random = GetRandomValue(0, 4);
@@ -31,12 +32,19 @@ void Gride::FillRandomly() {
     }
   }
 }
-void Gride::clear() {
+void Grid::clear() {
   for (int row = 0; row < rows; row++)
     for (int col = 0; col < cols; col++)
       cells[row][col] = 0;
 }
-void Gride::ToggleCell(int row, int col) {
-  if (IsWithinBounds(row, col))
+void Grid::toggleCell(int row, int col) {
+  if (isWithinBounds(row, col))
     cells[row][col] = !cells[row][col];
+}
+int Grid::getLiveCount() const {
+  int count = 0;
+  for (int row = 0; row < rows; row++)
+    for (int col = 0; col < cols; col++)
+      count += cells[row][col];
+  return count;
 }

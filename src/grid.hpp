@@ -1,25 +1,29 @@
 #pragma once
+#include <algorithm>
 #include <vector>
-using namespace std;
 
-class Gride {
+class Grid {
 public:
-  Gride(int width, int height, int cell_size)
-      : rows(height / cell_size), cols(width / cell_size), cell_size(cell_size),
-        cells(rows, vector<int>(cols, 0)) {}
+  Grid(int width, int height, int cell_size)
+      : cell_size(std::max(1, cell_size)),
+        rows(std::max(1, height / std::max(1, cell_size))),
+        cols(std::max(1, width / std::max(1, cell_size))),
+        cells(rows, std::vector<int>(cols, 0)) {}
   void Draw();
-  void SetValue(int row, int col, int value);
-  int getCell(int row, int col);
-  bool IsWithinBounds(int row, int col);
-  int getRows() { return rows; }
-  int getcols() { return cols; }
-  void FillRandomly();
+  void setValue(int row, int col, int value);
+  int getCell(int row, int col) const;
+  bool isWithinBounds(int row, int col) const;
+  int getRows() const { return rows; }
+  int getCols() const { return cols; }
+  int getCellSize() const { return cell_size; }
+  void fillRandomly();
   void clear();
-  void ToggleCell(int row, int col);
+  void toggleCell(int row, int col);
+  int getLiveCount() const;
 
 private:
+  int cell_size;
   int rows;
   int cols;
-  int cell_size;
-  vector<vector<int>> cells;
+  std::vector<std::vector<int>> cells;
 };
